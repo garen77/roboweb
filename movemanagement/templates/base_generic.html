@@ -26,6 +26,9 @@
     </head>
     <body>
         <div class="container-fluid height100perc">
+          <div id="app">
+            <!-- React will load here -->
+          </div>
           {% block container %}
 
           {% endblock %}
@@ -99,5 +102,6 @@
 
             setInterval(function(){heartBeat();},300);
         </script>
+        <script src="/static/frontend/main.js"></script>
     </body>
 </html>

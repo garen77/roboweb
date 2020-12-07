@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 
 class App extends Component {
+
+
   constructor(props) {
     super(props);
     this.state = {
@@ -16,8 +18,18 @@ class App extends Component {
   }
 
   render() {
+    const mystyle = {
+        width: "200px",
+        height: "200px",
+        position: "fixed",
+        left: "50%",
+        marginLeft: "-100px"
+    };
     return (
-      <div>React is active!</div>
+        <div className="justify-content-center">
+            <div id="joystickDiv" style={mystyle}></div>
+        </div>
+      
     );
   }
 }

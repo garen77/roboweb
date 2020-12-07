@@ -64,7 +64,19 @@ var App = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "React is active!");
+      var mystyle = {
+        width: "200px",
+        height: "200px",
+        position: "fixed",
+        left: "50%",
+        marginLeft: "-100px"
+      };
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "justify-content-center"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        id: "joystickDiv",
+        style: mystyle
+      }));
     }
   }]);
 

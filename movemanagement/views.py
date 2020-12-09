@@ -10,41 +10,58 @@ import explorerhat
 ROTATION_TIME = 20
 
 MOTOR_STOP = 0
-MOTOR_MOVE = 40
+MOTOR_SPEED_STEP = 20
+MOTOR_SPEED_ROTATION = 40
+MOTOR_MAX = 60
 MOTOR_SLEEP = 0.5
 
 directionRasp = 'C'
-
+motorSpeed = 0
 
 def stop():
     explorerhat.motor.one.stop()
     explorerhat.motor.two.stop()
+    motorSpeed = 0
 
 
 def forward():
-    explorerhat.motor.one.speed(MOTOR_MOVE)
-    explorerhat.motor.two.speed(MOTOR_MOVE)
+    global motorSpeed
+    if motorSpeed <= 0:
+        motorSpeed = MOTOR_SPEED_STEP
+    elif motorSpeed < MOTOR_MAX:
+        motorSpeed = motorSpeed + MOTOR_SPEED_STEP
+    else:
+        motorSpeed = MOTOR_MAX
+    explorerhat.motor.one.speed(motorSpeed)
+    explorerhat.motor.two.speed(motorSpeed)
     time.sleep(MOTOR_SLEEP)
     stop()
 
 
 def backward():
-    explorerhat.motor.one.speed(-1 * MOTOR_MOVE)
-    explorerhat.motor.two.speed(-1 * MOTOR_MOVE)
+    global motorSpeed
+    if motorSpeed >= 0:
+        motorSpeed = -1 * MOTOR_SPEED_STEP
+    elif motorSpeed > MOTOR_MAX:
+        motorSpeed = motorSpeed - MOTOR_SPEED_STEP
+    else:
+        motorSpeed = -1 * MOTOR_MAX
+    explorerhat.motor.one.speed(motorSpeed)
+    explorerhat.motor.two.speed(motorSpeed)
     time.sleep(MOTOR_SLEEP)
     stop()
 
 
 def right():
-    explorerhat.motor.one.speed(MOTOR_MOVE)
-    explorerhat.motor.two.speed(-1 * MOTOR_MOVE)
+    explorerhat.motor.one.speed(MOTOR_SPEED_ROTATION)
+    explorerhat.motor.two.speed(-1 * MOTOR_SPEED_ROTATION)
     time.sleep(MOTOR_SLEEP)
     stop()
 
 
 def left():
-    explorerhat.motor.one.speed(-1 * MOTOR_MOVE)
-    explorerhat.motor.two.speed(MOTOR_MOVE)
+    explorerhat.motor.one.speed(-1 * MOTOR_SPEED_ROTATION)
+    explorerhat.motor.two.speed(MOTOR_SPEED_ROTATION)
     time.sleep(MOTOR_SLEEP)
     stop()
 
@@ -54,6 +71,10 @@ mapDirection = {
     'E': right,
     'W': left,
     'S': backward,
+    'NE': right,
+    'NW': left,
+    'SE': right,
+    'SW': left,
     'C': stop,
     }
 

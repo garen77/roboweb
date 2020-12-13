@@ -37,7 +37,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 
-
+ //import Iframe from './iframe';
 
 var App = /*#__PURE__*/function (_Component) {
   _inherits(App, _Component);
@@ -70,7 +70,8 @@ var App = /*#__PURE__*/function (_Component) {
         position: "fixed",
         left: "50%",
         marginLeft: "-100px"
-      };
+      }; //<!Iframe source={"http://192.168.1.3:8082/?action=stream"} />
+
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "justify-content-center"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {

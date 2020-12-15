@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-//import Iframe from './iframe';
+import Iframe from './iframe';
+import "../styles/App.scss"
 
 class App extends Component {
 
@@ -19,18 +20,16 @@ class App extends Component {
   }
 
   render() {
-    const mystyle = {
-        width: "200px",
-        height: "200px",
-        position: "fixed",
-        left: "50%",
-        marginLeft: "-100px"
-    };
-    //<!Iframe source={"http://192.168.1.3:8082/?action=stream"} />
+ 
+
     return (
+        <React.Fragment>
           <div className="justify-content-center">
-              <div id="joystickDiv" style={mystyle}></div>
+              <div id="joystickDiv" className="joystick-div"></div>
           </div>
+          <Iframe source={"http://192.168.1.3:8082?action=stream"} />
+        </React.Fragment>
+
       
     );
   }

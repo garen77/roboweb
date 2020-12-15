@@ -186,7 +186,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".container-camera-view {\n  width: 420px;\n  height: 420px;\n  position: fixed;\n  top: 270px;\n  left: 50%;\n  margin-left: -220px; }\n\n.camera-view {\n  width: 400px;\n  height: 400px; }\n", "",{"version":3,"sources":["webpack://./src/styles/iframe.scss"],"names":[],"mappings":"AAAA;EACI,YAAY;EACZ,aAAa;EACb,eAAe;EACf,UAAU;EACV,SAAS;EACT,mBAAmB,EAAA;;AAGtB;EACG,YAAY;EACZ,aAAa,EAAA","sourcesContent":[".container-camera-view {\n    width: 420px;\n    height: 420px;\n    position: fixed;\n    top: 270px;\n    left: 50%;\n    margin-left: -220px;\n}\n\n .camera-view {\n    width: 400px;\n    height: 400px;\n};"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, ".container-camera-view {\n  width: 406px;\n  height: 306px;\n  position: fixed;\n  top: 270px;\n  left: 50%;\n  margin-left: -220px; }\n\n.camera-view {\n  width: 410px;\n  height: 310px; }\n", "",{"version":3,"sources":["webpack://./src/styles/iframe.scss"],"names":[],"mappings":"AAAA;EACI,YAAY;EACZ,aAAa;EACb,eAAe;EACf,UAAU;EACV,SAAS;EACT,mBAAmB,EAAA;;AAGtB;EACG,YAAY;EACZ,aAAa,EAAA","sourcesContent":[".container-camera-view {\n    width: 406px;\n    height: 306px;\n    position: fixed;\n    top: 270px;\n    left: 50%;\n    margin-left: -220px;\n}\n\n .camera-view {\n    width: 410px;\n    height: 310px;\n};"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 import time
 import explorerhat
+from .imagenet_classifier import classicyImage
 
 ROTATION_TIME = 20
 
@@ -107,3 +108,9 @@ def move(request):
         else:
             return JsonResponse({'direction': 'null'})
     return Response({'message': 'move'})
+
+
+@api_view(['GET', 'POST'])
+def recognize(request):
+    if request.method == 'POST':
+        

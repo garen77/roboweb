@@ -1,8 +1,20 @@
-import tensorflow as tf
+
 from tflite_runtime.interpreter import Interpreter 
 from PIL import Image
 import numpy as np
 import time
+from picamera import PiCamera
+
+camera = PiCamera()
+
+IMAGE_SHAPE = (224, 224)
+
+data_folder = "/home/pi/roboproject/TFLiteMobileNet/"
+
+captured_image_folder = "/home/pi/roboproject/"
+
+model_path = data_folder + "mobilenet_v1_1.0_224_quant.tflite"
+label_path = data_folder + "labels_mobilenet_quant_v1_224.txt"
 
 def load_labels(path): # Read the labels from the text file as a Python list.
     with open(path, 'r') as f:
@@ -26,16 +38,8 @@ def classify_image(interpreter, image, top_k=1):
     ordered = np.argpartition(-output, 1)
     return [(i, output[i]) for i in ordered[:top_k]][0]
 
-IMAGE_SHAPE = (224, 224)
 
-data_folder = "/home/pi/roboproject/TFLiteMobileNet/"
-
-captured_image_folder = "/home/pi/roboproject/"
-
-model_path = data_folder + "mobilenet_v1_1.0_224_quant.tflite"
-label_path = data_folder + "labels_mobilenet_quant_v1_224.txt"
-
-def classicyImage():
+def classifyImage():
     interpreter = Interpreter(model_path)
     print("Model Loaded Successfully.")
     interpreter.allocate_tensors()
@@ -43,6 +47,10 @@ def classicyImage():
     print("Image Shape (", width, ",", height, ")")
     # Load an image to be classified.
     #grace_hopper = tf.keras.utils.get_file('image.jpg','https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg')
+    camera.start_preview()
+    time.sleep(5)
+    camera.capture(captured_image_folder + 'image.jpg')
+    camera.stop_preview()
     image_to_analyze = Image.open(captured_image_folder + 'image.jpg').resize(IMAGE_SHAPE)
     # Classify the image.
     time1 = time.time()

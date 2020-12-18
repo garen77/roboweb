@@ -18,10 +18,9 @@ class App extends Component {
   componentDidMount() {
  
   }
-
+  
   render() {
  
-
     return (
         <React.Fragment>
           <div className="justify-content-center">

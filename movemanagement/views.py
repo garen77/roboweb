@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 import time
 import explorerhat
-from .imagenet_classifier import classicyImage
+from .imagenet_classifier import classifyImage
+
 
 ROTATION_TIME = 20
 
@@ -18,6 +19,8 @@ MOTOR_SLEEP = 0.5
 
 directionRasp = 'C'
 motorSpeed = 0
+
+
 
 def stop():
     explorerhat.motor.one.stop()
@@ -112,5 +115,8 @@ def move(request):
 
 @api_view(['GET', 'POST'])
 def recognize(request):
-    if request.method == 'POST':
-        
+    if request.method == 'GET':
+        res = classifyImage()
+        classified = str(res[0]) + " " + str(res[1])
+        return JsonResponse({'recognized': classified})
+    return JsonResponse({'recognized': 'nothing'})        

@@ -6,6 +6,12 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 import time
 import explorerhat
+import base64
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+import time
+from picamera import PiCamera
+from django.http import HttpResponse
 from .imagenet_classifier import classifyImage
 
 
@@ -19,7 +25,8 @@ MOTOR_SLEEP = 0.5
 
 directionRasp = 'C'
 motorSpeed = 0
-
+captured_image_folder = "/home/pi/roboproject/"
+camera = PiCamera()
 
 
 def stop():
@@ -115,8 +122,24 @@ def move(request):
 
 @api_view(['GET', 'POST'])
 def recognize(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
+        dataImg64 = request.POST.get('image')
+        format, imgStr = dataImg64.split(';base64,')
+        ext = format.split('/')[-1]
+        img = ContentFile(base64.b64decode(imgStr), name='image.' + ext)
+        default_storage.save('/home/pi/roboproject',img)
         res = classifyImage()
         classified = str(res[0]) + " " + str(res[1])
         return JsonResponse({'recognized': classified})
     return JsonResponse({'recognized': 'nothing'})        
+
+
+@api_view(['GET', 'POST'])
+def stream(request):
+    if request.method == 'GET':
+        camera.start_preview()
+        time.sleep(5)
+        camera.capture(captured_image_folder + 'image.jpeg')
+        camera.stop_preview()
+        image_data = open(captured_image_folder+"image.jpeg", "rb").read()
+        return HttpResponse(image_data, content_type="image/jpeg")

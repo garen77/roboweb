@@ -3,9 +3,9 @@ from tflite_runtime.interpreter import Interpreter
 from PIL import Image
 import numpy as np
 import time
-from picamera import PiCamera
+#from picamera import PiCamera
 
-camera = PiCamera()
+#camera = PiCamera()
 
 IMAGE_SHAPE = (224, 224)
 
@@ -47,10 +47,10 @@ def classifyImage():
     print("Image Shape (", width, ",", height, ")")
     # Load an image to be classified.
     #grace_hopper = tf.keras.utils.get_file('image.jpg','https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg')
-    camera.start_preview()
-    time.sleep(5)
-    camera.capture(captured_image_folder + 'image.jpg')
-    camera.stop_preview()
+    #camera.start_preview()
+    #time.sleep(5)
+    #camera.capture(captured_image_folder + 'image.jpg')
+    #camera.stop_preview()
     image_to_analyze = Image.open(captured_image_folder + 'image.jpg').resize(IMAGE_SHAPE)
     # Classify the image.
     time1 = time.time()

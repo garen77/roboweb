@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
+import html2canvas from 'html2canvas';
 import "../styles/iframe.scss"
 
 
@@ -11,10 +12,29 @@ class Iframe extends Component {
         this.state = {
           recognized: null
         };
-      }
+    }
 
     recognize(ctx,callback) {
-        var xmlHttp = new XMLHttpRequest();
+
+	html2canvas(document.getElementById("iddiviframe")).then(
+	     function(canvas) {
+	          var base64Url = canvas.toDataURL('image/jpeg').replace('image/jpeg','image/octet-stream');
+		  var xmlHttp = new XMLHttpRequest();
+		  xmlHttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var jsonResponse = JSON.parse(this.responseText);
+				callback(ctx,jsonResponse.recognized);
+			}
+		  };
+		  xmlHttp.open("POST", "/movemanagement/recognize", true);
+		  xmlHttp.setRequestHeader("Content-type", "application/json");
+		  
+		  var parameters="image=" + base64Url;
+		  xmlHttp.send(null);
+	     }
+	);
+
+        /*var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
             var jsonResponse = JSON.parse(this.responseText);
@@ -25,7 +45,7 @@ class Iframe extends Component {
         xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xmlHttp.overrideMimeType("application/json");
 
-        xmlHttp.send(null);
+        xmlHttp.send(null);*/
     }      
 
     recognizeCallback(ctx,rec) {
@@ -41,8 +61,8 @@ class Iframe extends Component {
             <React.Fragment>
                 {this.state.recognized ? (<div>{this.state.recognized}</div>) : null}
                 <div onClick={() => this.recognize(this,this.recognizeCallback)} className="col-md-12">
-                    <div className="container-camera-view" >
-                        <iframe className="camera-view" src={src}></iframe>
+                    <div id="iddiviframe" className="container-camera-view" >
+                        <iframe id="idiframe" className="camera-view" src={src}></iframe>
                     </div>
                 </div>
             </React.Fragment>

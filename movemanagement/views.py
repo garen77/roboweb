@@ -25,9 +25,9 @@ MOTOR_SLEEP = 0.5
 
 directionRasp = 'C'
 motorSpeed = 0
-captured_image_folder = "/home/pi/roboproject/"
+captured_image_folder = "/home/pi/roboproject/roboweb/movemanagement/static/img/"
 camera = PiCamera()
-
+camera.vflip = True
 
 def stop():
     explorerhat.motor.one.stop()
@@ -122,24 +122,14 @@ def move(request):
 
 @api_view(['GET', 'POST'])
 def recognize(request):
-    if request.method == 'POST':
-        dataImg64 = request.POST.get('image')
-        format, imgStr = dataImg64.split(';base64,')
-        ext = format.split('/')[-1]
-        img = ContentFile(base64.b64decode(imgStr), name='image.' + ext)
-        default_storage.save('/home/pi/roboproject',img)
-        res = classifyImage()
-        classified = str(res[0]) + " " + str(res[1])
-        return JsonResponse({'recognized': classified})
-    return JsonResponse({'recognized': 'nothing'})        
-
-
-@api_view(['GET', 'POST'])
-def stream(request):
     if request.method == 'GET':
         camera.start_preview()
-        time.sleep(5)
-        camera.capture(captured_image_folder + 'image.jpeg')
+        time.sleep(1)
+        camera.capture(captured_image_folder + 'image.jpg')
         camera.stop_preview()
-        image_data = open(captured_image_folder+"image.jpeg", "rb").read()
-        return HttpResponse(image_data, content_type="image/jpeg")
+        res = classifyImage()
+        image_data = base64.b64encode(open(captured_image_folder+"image.jpg", "rb").read()).decode('utf-8')
+        classified = str(res[0]) + " " + str(res[1])
+        return JsonResponse({'recognized': classified, 'imagerecognized': image_data})
+    return JsonResponse({'recognized': 'nothing'})        
+

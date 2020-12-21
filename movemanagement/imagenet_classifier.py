@@ -11,7 +11,7 @@ IMAGE_SHAPE = (224, 224)
 
 data_folder = "/home/pi/roboproject/TFLiteMobileNet/"
 
-captured_image_folder = "/home/pi/roboproject/"
+captured_image_folder = "/home/pi/roboproject/roboweb/movemanagement/static/img/"
 
 model_path = data_folder + "mobilenet_v1_1.0_224_quant.tflite"
 label_path = data_folder + "labels_mobilenet_quant_v1_224.txt"

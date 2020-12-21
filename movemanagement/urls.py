@@ -6,5 +6,5 @@ urlpatterns = [
     path('move', views.move),
     path('heartBeat', views.heartBeat),
     path('recognize', views.recognize),
-    path('stream', views.stream),
+
 ]

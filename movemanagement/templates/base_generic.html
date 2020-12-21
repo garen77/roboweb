@@ -77,6 +77,7 @@
             });
 
             var Joy1 = new JoyStick('joystickDiv');
+
             function heartBeat() {
               var ctx = this;
               var directionRasp = null;
@@ -96,6 +97,25 @@
               if(ctx.directionRasp && direction.dirInternal != ctx.directionRasp) {
                 sendDirection(direction.dirInternal,context);
               }
+            }
+
+            function stream() {
+              var ctx = this;
+              var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                      var jsonResponse = JSON.parse(this.responseText);
+                      if(jsonResponse.imagestream) {
+                        document.getElementById('idstream').src = '/static/img/image.jpg';
+                      }
+                    }
+                };
+                xmlHttp.open("GET", "/movemanagement/stream", true);
+                xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlHttp.overrideMimeType("application/json");
+  
+                xmlHttp.send(null);
+
             }
 
             setInterval(function(){ direction.dir=Joy1.GetDir(); }, 200);

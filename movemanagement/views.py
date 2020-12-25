@@ -10,24 +10,83 @@ import base64
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 import time
+import RPi.GPIO as GPIO
 from picamera import PiCamera
 from django.http import HttpResponse
+import threading
 from .imagenet_classifier import classifyImage
 
+PIN_TRIGGER_LEFT = 18
+PIN_ECHO_LEFT = 8
+PIN_ECHO_RIGHT = 1
+PIN_TRIGGER_RIGHT = 7
+
+#PIN_TRIGGER_LEFT = 7
+#PIN_ECHO_LEFT = 1
+#PIN_ECHO_RIGHT = 8
+#PIN_TRIGGER_RIGHT = 18
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PIN_TRIGGER_LEFT, GPIO.OUT)
+GPIO.setup(PIN_ECHO_LEFT, GPIO.IN)
+
+GPIO.setup(PIN_TRIGGER_RIGHT, GPIO.OUT)
+GPIO.setup(PIN_ECHO_RIGHT, GPIO.IN)
 
 ROTATION_TIME = 20
 
 MOTOR_STOP = 0
 MOTOR_SPEED_STEP = 20
-MOTOR_SPEED_ROTATION = 40
-MOTOR_MAX = 60
-MOTOR_SLEEP = 0.5
+MOTOR_SPEED_ROTATION = 30
+MOTOR_MAX = 40
+MOTOR_SLEEP = 0.28
 
 directionRasp = 'C'
 motorSpeed = 0
 captured_image_folder = "/home/pi/roboproject/roboweb/movemanagement/static/img/"
 camera = PiCamera()
 camera.vflip = True
+
+pulse_start_left_time = time.time()
+pulse_end_left_time = time.time()
+pulse_start_right_time = time.time()
+pulse_end_right_time = time.time()
+def thread_distance(name):
+    try:
+        while True:
+            global pulse_start_left_time
+            global pulse_end_left_time
+            global pulse_start_right_time
+            global pulse_end_right_time
+            print("--------Start distance rilevation thread ",name)
+            GPIO.output(PIN_TRIGGER_LEFT, GPIO.LOW)
+            time.sleep(1)
+            GPIO.output(PIN_TRIGGER_LEFT, GPIO.HIGH)
+            time.sleep(0.00001)
+            GPIO.output(PIN_TRIGGER_LEFT, GPIO.LOW)
+            while GPIO.input(PIN_ECHO_LEFT)==0:
+                pulse_start_left_time = time.time()
+            while GPIO.input(PIN_ECHO_LEFT)==1:
+                pulse_end_left_time = time.time()
+            pulse_left_duration = pulse_end_left_time - pulse_start_left_time
+            left_distance = round(pulse_left_duration * 17150, 2)
+            print("--------Left Distance:",left_distance," cm")
+            GPIO.output(PIN_TRIGGER_RIGHT, GPIO.LOW)
+            time.sleep(1)
+            GPIO.output(PIN_TRIGGER_RIGHT, GPIO.HIGH)
+            time.sleep(0.00001)
+            GPIO.output(PIN_TRIGGER_RIGHT, GPIO.LOW)
+            while GPIO.input(PIN_ECHO_RIGHT)==0:
+                pulse_start_right_time = time.time()
+            while GPIO.input(PIN_ECHO_RIGHT)==1:
+                pulse_end_right_time = time.time()
+            pulse_right_duration = pulse_end_right_time - pulse_start_right_time
+            right_distance = round(pulse_right_duration * 17150, 2)
+            print("--------Right Distance:",right_distance," cm")
+            print("--------End distance rilevation thread ",name)
+    finally:
+        GPIO.cleanup()
+
+
 
 def stop():
     explorerhat.motor.one.stop()
@@ -133,3 +192,6 @@ def recognize(request):
         return JsonResponse({'recognized': classified, 'imagerecognized': image_data})
     return JsonResponse({'recognized': 'nothing'})        
 
+
+td = threading.Thread(target=thread_distance, args=(1,))
+td.start()

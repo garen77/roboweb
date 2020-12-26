@@ -59,7 +59,8 @@ var App = /*#__PURE__*/function (_Component) {
       loaded: false,
       placeholder: "Loading",
       recognized: null,
-      imagerecognized: null
+      imagerecognized: null,
+      selfdriving: '0'
     };
     return _this;
   }
@@ -93,10 +94,34 @@ var App = /*#__PURE__*/function (_Component) {
       xmlHttp.send(null);
     }
   }, {
+    key: "selfDriving",
+    value: function selfDriving(ctx, value) {
+      ctx.setState({
+        selfdriving: '0'
+      });
+      var xmlHttp = new XMLHttpRequest();
+
+      xmlHttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var jsonResponse = JSON.parse(this.responseText);
+          ctx.setState({
+            selfdriving: jsonResponse.selfdriving
+          });
+        }
+      };
+
+      var parameters = "selfdriving=" + value;
+      xmlHttp.open("POST", "/movemanagement/selfDriving", true);
+      xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xmlHttp.overrideMimeType("application/json");
+      xmlHttp.send(parameters);
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
 
+      var selfdrivingValueToSend = this.state.selfdriving == '0' ? '1' : '0';
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
         className: "justify-content-center"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -106,7 +131,6 @@ var App = /*#__PURE__*/function (_Component) {
         className: "container-recognize"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
         className: "button-recognize",
-        value: "Recognize",
         onClick: function onClick() {
           return _this2.recognize(_this2);
         }
@@ -116,7 +140,14 @@ var App = /*#__PURE__*/function (_Component) {
         id: "idstream",
         className: "recognized-image",
         src: this.state.imagerecognized
-      }) : null)));
+      }) : null, this.state.selfdriving ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+        className: "min-height"
+      }, this.state.selfdriving) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
+        className: "button-recognize",
+        onClick: function onClick() {
+          return _this2.selfDriving(_this2, selfdrivingValueToSend);
+        }
+      }, this.state.selfdriving == '0' ? "Self Driving Activate" : "Self Driving Deactivate"))));
     }
   }]);
 

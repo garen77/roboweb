@@ -13,7 +13,8 @@ class App extends Component {
       loaded: false,
       placeholder: "Loading",
       recognized: null,
-      imagerecognized: null
+      imagerecognized: null,
+      selfdriving: '0'
     };
   }
 
@@ -43,20 +44,44 @@ class App extends Component {
 
   }   
 
+  selfDriving(ctx,value) {
+    ctx.setState({
+      selfdriving: '0'
+    });
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+          var jsonResponse = JSON.parse(this.responseText);
+          ctx.setState({
+            selfdriving: jsonResponse.selfdriving
+          });  
+      }
+    };
+    var parameters="selfdriving="+value;
+    xmlHttp.open("POST", "/movemanagement/selfDriving", true);
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlHttp.overrideMimeType("application/json");
+    xmlHttp.send(parameters);
+  }  
+
   render() {
- 
+    const selfdrivingValueToSend = this.state.selfdriving == '0' ? '1' : '0';
     return (
         <React.Fragment>
           <div className="justify-content-center">
               <div id="joystickDiv" className="joystick-div"></div>
               <div className="container-recognize"> 
-                <button className="button-recognize" value="Recognize" onClick={() => this.recognize(this)} >
+                <button className="button-recognize" onClick={() => this.recognize(this)} >
                   Recognize
                 </button>
                 {this.state.recognized ? (<div className="min-height">{this.state.recognized}</div>) : null}
                 {this.state.imagerecognized ? (
                   <img id="idstream" className="recognized-image" src={this.state.imagerecognized}></img>
                 ) : null}
+                {this.state.selfdriving ? (<div className="min-height">{this.state.selfdriving}</div>) : null}
+                <button className="button-recognize" onClick={() => this.selfDriving(this,selfdrivingValueToSend)} >
+                    {this.state.selfdriving == '0' ? "Self Driving Activate" : "Self Driving Deactivate"} 
+                </button>
               </div>
           </div>
         </React.Fragment>

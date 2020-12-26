@@ -38,7 +38,9 @@ MOTOR_STOP = 0
 MOTOR_SPEED_STEP = 20
 MOTOR_SPEED_ROTATION = 30
 MOTOR_MAX = 40
-MOTOR_SLEEP = 0.28
+MOTOR_SLEEP = 0.20
+
+MINIMUM_DISTANCE = 10
 
 directionRasp = 'C'
 motorSpeed = 0
@@ -46,46 +48,57 @@ captured_image_folder = "/home/pi/roboproject/roboweb/movemanagement/static/img/
 camera = PiCamera()
 camera.vflip = True
 
-pulse_start_left_time = time.time()
-pulse_end_left_time = time.time()
-pulse_start_right_time = time.time()
-pulse_end_right_time = time.time()
+selfDrivingactive = False
+
+pulse_start_time = time.time()
+pulse_end_time = time.time()
+left_distance = 10
+right_distance = 10
+
 def thread_distance(name):
     try:
         while True:
-            global pulse_start_left_time
-            global pulse_end_left_time
-            global pulse_start_right_time
-            global pulse_end_right_time
+            global pulse_start_time
+            global pulse_end_time			
+            global left_distance
+            global right_distance
+
             print("--------Start distance rilevation thread ",name)
             GPIO.output(PIN_TRIGGER_LEFT, GPIO.LOW)
-            time.sleep(1)
+            time.sleep(0.5)
             GPIO.output(PIN_TRIGGER_LEFT, GPIO.HIGH)
             time.sleep(0.00001)
             GPIO.output(PIN_TRIGGER_LEFT, GPIO.LOW)
             while GPIO.input(PIN_ECHO_LEFT)==0:
-                pulse_start_left_time = time.time()
+                pulse_start_time = time.time()
             while GPIO.input(PIN_ECHO_LEFT)==1:
-                pulse_end_left_time = time.time()
-            pulse_left_duration = pulse_end_left_time - pulse_start_left_time
-            left_distance = round(pulse_left_duration * 17150, 2)
+                pulse_end_time = time.time()
+            pulse_duration = pulse_end_time - pulse_start_time
+            left_distance = round(pulse_duration * 17150, 2)
             print("--------Left Distance:",left_distance," cm")
             GPIO.output(PIN_TRIGGER_RIGHT, GPIO.LOW)
-            time.sleep(1)
+            time.sleep(0.5)
             GPIO.output(PIN_TRIGGER_RIGHT, GPIO.HIGH)
             time.sleep(0.00001)
             GPIO.output(PIN_TRIGGER_RIGHT, GPIO.LOW)
             while GPIO.input(PIN_ECHO_RIGHT)==0:
-                pulse_start_right_time = time.time()
+                pulse_start_time = time.time()
             while GPIO.input(PIN_ECHO_RIGHT)==1:
-                pulse_end_right_time = time.time()
-            pulse_right_duration = pulse_end_right_time - pulse_start_right_time
-            right_distance = round(pulse_right_duration * 17150, 2)
+                pulse_end_time = time.time()
+            pulse_duration = pulse_end_time - pulse_start_time
+            right_distance = round(pulse_duration * 17150, 2)
             print("--------Right Distance:",right_distance," cm")
             print("--------End distance rilevation thread ",name)
     finally:
         GPIO.cleanup()
 
+
+def thread_self_driving(name):
+    global selfDrivingactive
+    while True:
+        if selfDrivingactive:
+            forward()
+            time.sleep(MOTOR_SLEEP)
 
 
 def stop():
@@ -95,6 +108,9 @@ def stop():
 
 
 def forward():
+    i = 0
+    while i < 5 and (left_distance < MINIMUM_DISTANCE or right_distance < MINIMUM_DISTANCE):
+        obstacle_avoid()
     global motorSpeed
     if motorSpeed <= 0:
         motorSpeed = MOTOR_SPEED_STEP
@@ -134,6 +150,13 @@ def left():
     explorerhat.motor.two.speed(MOTOR_SPEED_ROTATION)
     time.sleep(MOTOR_SLEEP)
     stop()
+
+def obstacle_avoid():
+    backward()
+    if left_distance < MINIMUM_DISTANCE:
+        right()
+    elif right_distance < MINIMUM_DISTANCE:
+        left()
 
 
 mapDirection = {
@@ -192,6 +215,24 @@ def recognize(request):
         return JsonResponse({'recognized': classified, 'imagerecognized': image_data})
     return JsonResponse({'recognized': 'nothing'})        
 
+@api_view(['GET', 'POST'])
+def selfDriving(request):
+    global selfDrivingactive
+    if request.method == 'POST':
+        selfdriving = request.POST.get('selfdriving') 
+        if selfdriving == '1':
+            selfDrivingactive = True
+            print("######### thread started selfdriving ",selfdriving)
+        elif selfdriving == '0':
+            selfDrivingactive = False
+            print("######### thread stopped selfdriving ",selfdriving)
+        else:
+            print("######### thread state not started and not stopped selfdriving ",selfdriving)
+        return JsonResponse({'selfdriving': selfdriving})		
+    return JsonResponse({'selfdriving': '0'})
 
 td = threading.Thread(target=thread_distance, args=(1,))
 td.start()
+
+tsd = threading.Thread(target=thread_self_driving, args=(2,))
+tsd.start()

@@ -36,11 +36,11 @@ ROTATION_TIME = 20
 
 MOTOR_STOP = 0
 MOTOR_SPEED_STEP = 20
-MOTOR_SPEED_ROTATION = 30
-MOTOR_MAX = 40
+MOTOR_SPEED_ROTATION = 35
+MOTOR_MAX = 35
 MOTOR_SLEEP = 0.20
 
-MINIMUM_DISTANCE = 10
+MINIMUM_DISTANCE = 20
 
 directionRasp = 'C'
 motorSpeed = 0
@@ -63,7 +63,7 @@ def thread_distance(name):
             global left_distance
             global right_distance
 
-            print("--------Start distance rilevation thread ",name)
+            #print("--------Start distance rilevation thread ",name)
             GPIO.output(PIN_TRIGGER_LEFT, GPIO.LOW)
             time.sleep(0.5)
             GPIO.output(PIN_TRIGGER_LEFT, GPIO.HIGH)
@@ -75,7 +75,7 @@ def thread_distance(name):
                 pulse_end_time = time.time()
             pulse_duration = pulse_end_time - pulse_start_time
             left_distance = round(pulse_duration * 17150, 2)
-            print("--------Left Distance:",left_distance," cm")
+            #print("--------Left Distance:",left_distance," cm")
             GPIO.output(PIN_TRIGGER_RIGHT, GPIO.LOW)
             time.sleep(0.5)
             GPIO.output(PIN_TRIGGER_RIGHT, GPIO.HIGH)
@@ -87,8 +87,8 @@ def thread_distance(name):
                 pulse_end_time = time.time()
             pulse_duration = pulse_end_time - pulse_start_time
             right_distance = round(pulse_duration * 17150, 2)
-            print("--------Right Distance:",right_distance," cm")
-            print("--------End distance rilevation thread ",name)
+            #print("--------Right Distance:",right_distance," cm")
+            #print("--------End distance rilevation thread ",name)
     finally:
         GPIO.cleanup()
 
@@ -101,6 +101,7 @@ def thread_self_driving(name):
             time.sleep(MOTOR_SLEEP)
 
 
+
 def stop():
     explorerhat.motor.one.stop()
     explorerhat.motor.two.stop()
@@ -110,33 +111,19 @@ def stop():
 def forward():
     i = 0
     while i < 5 and (left_distance < MINIMUM_DISTANCE or right_distance < MINIMUM_DISTANCE):
+        i = i + 1
         obstacle_avoid()
-    global motorSpeed
-    if motorSpeed <= 0:
-        motorSpeed = MOTOR_SPEED_STEP
-    elif motorSpeed < MOTOR_MAX:
-        motorSpeed = motorSpeed + MOTOR_SPEED_STEP
-    else:
-        motorSpeed = MOTOR_MAX
-    explorerhat.motor.one.speed(motorSpeed)
-    explorerhat.motor.two.speed(motorSpeed)
+    explorerhat.motor.one.speed(MOTOR_MAX)
+    explorerhat.motor.two.speed(MOTOR_MAX)
     time.sleep(MOTOR_SLEEP)
     stop()
 
 
 def backward():
-    global motorSpeed
-    if motorSpeed >= 0:
-        motorSpeed = -1 * MOTOR_SPEED_STEP
-    elif motorSpeed > MOTOR_MAX:
-        motorSpeed = motorSpeed - MOTOR_SPEED_STEP
-    else:
-        motorSpeed = -1 * MOTOR_MAX
-    explorerhat.motor.one.speed(motorSpeed)
-    explorerhat.motor.two.speed(motorSpeed)
+    explorerhat.motor.one.speed(-1 * MOTOR_MAX)
+    explorerhat.motor.two.speed(-1 * MOTOR_MAX)
     time.sleep(MOTOR_SLEEP)
     stop()
-
 
 def right():
     explorerhat.motor.one.speed(MOTOR_SPEED_ROTATION)
@@ -222,12 +209,11 @@ def selfDriving(request):
         selfdriving = request.POST.get('selfdriving') 
         if selfdriving == '1':
             selfDrivingactive = True
-            print("######### thread started selfdriving ",selfdriving)
+            #print("######### thread started selfdriving ",selfdriving)
         elif selfdriving == '0':
             selfDrivingactive = False
-            print("######### thread stopped selfdriving ",selfdriving)
-        else:
-            print("######### thread state not started and not stopped selfdriving ",selfdriving)
+            stop()
+            #print("######### thread stopped selfdriving ",selfdriving)
         return JsonResponse({'selfdriving': selfdriving})		
     return JsonResponse({'selfdriving': '0'})
 
